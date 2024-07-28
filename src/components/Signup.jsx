@@ -59,8 +59,6 @@ const Signup = () => {
     };
 
 
-
-
     const handleSubmit = (e) => {
         e.preventDefault();
         const validationErrors = validate();
@@ -89,7 +87,19 @@ const Signup = () => {
 
       };
 
-
+    
+      axios.defaults.withCredentials = true;
+      useEffect(() => {
+        axios.get('http://localhost:5001/dashboard')
+        .then( res => {
+          console.log(res);
+          if(res.data.valid){
+              navigate('/dashboard');
+          }else {
+              navigate('/signup');
+          }
+        })
+      })
       const handleSignIn = (e) => {
         e.preventDefault();
         let errors = {};
@@ -104,11 +114,11 @@ const Signup = () => {
                 password: signinData.password
                 })
             .then(result => {
-                console.log(result)
-                if(result.data.message === "success"){
-                    navigate('/home')
-                }else {
-                    setErrors({ password: 'Incorrect password or username!' });
+                console.log(result);
+                if (result.data.SignIn) {
+                    navigate('/dashboard');
+                } else {
+                    setErrors({ ...errors, server: result.data.message });
                 }
                 // NavigateBefore('/home')
             })

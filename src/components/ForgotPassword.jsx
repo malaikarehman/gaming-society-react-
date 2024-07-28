@@ -32,7 +32,7 @@ const ForgotPassword = () => {
                 .then(result => {
                     console.log(result);
                     if(result.data.message === "success"){
-                        navigate("/login");
+                        // navigate("/login");
                     }
                 })
                 .catch(err => console.log(err));

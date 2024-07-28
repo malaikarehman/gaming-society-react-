@@ -4,6 +4,8 @@ const cors = require("cors");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
+const session = require("express-session");
+const bodyParser = require("body-parser");
 const nodemailer = require("nodemailer");
 const MemberModel = require('./models/Member');
 
@@ -11,10 +13,22 @@ const app= express();
 const PORT = process.env.PORT || 5001; 
 
 app.use(express.json());
+app.use(cookieParser());
+app.use(bodyParser.json());
+
 app.use(cors({
     origin: ["http://localhost:5173"],
     methods: ["GET", "POST"],
     credentials: true
+}));
+app.use(session({
+    secret: 'malaika',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: false,
+        maxAge: 1000 * 60 * 60 *24
+    }
 }));
 
 mongoose.connect("mongodb://localhost:27017/GamingSociety")
@@ -23,6 +37,14 @@ mongoose.connect("mongodb://localhost:27017/GamingSociety")
 }).catch(err => {
     console.error('Failed to connect to MongoDB', err);
 });
+
+app.get('/dashboard', (req, res) => {
+    if(req.session.username){
+        return res.json({valid: true, username: req.session.username });
+    }else {
+        return res.json({valid: false});
+    }
+})
 
 app.post("/signup", (req, res) => {
     const {name, email, password, role, team} = req.body;
@@ -45,27 +67,29 @@ app.post("/signin", (req, res) => {
         .then(user => {
             if (!user) {
                 console.log('User not found');
-                return res.status(404).json({ message: "User not found" });
+                return res.status(404).json({ message: "User not found" , SignIn: false});
             }
             // Compare the provided password with the hashed password stored in the database
             bcrypt.compare(password, user.password)
                 .then(match => {
                     if (match) {
                         console.log('Signin success');
-                        return res.status(200).json({ message: "success" });
+                        req.session.username = user.name;
+                        console.log(req.session.username);
+                        return res.status(200).json({SignIn: true});
                     } else {
                         console.log('Incorrect password');
-                        return res.status(401).json({ message: "The password is incorrect!" });
+                        return res.status(401).json({ message: "The password is incorrect!", SignIn: false });
                     }
                 })
                 .catch(err => {
                     console.error('Password comparison error:', err);
-                    res.status(500).json({ error: 'Internal server error' });
+                    res.status(500).json({ error: 'Internal server error', SignIn: false });
                 });
         })
         .catch(err => {
             console.error('Signin error:', err);
-            res.status(500).json({ error: 'Internal server error' });
+            res.status(500).json({ error: 'Internal server error', SignIn: false });
         });
 });
 
