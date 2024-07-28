@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import './Signup.css';
+import Login from './Login';
 
 const Signup = () => {
     const [formData, setFormData] = useState({
@@ -241,6 +242,8 @@ const Signup = () => {
                                 </b>
                             </p>
                         </form>
+                        <p>OR</p>
+                        <Login />
                     </div>
                 </div>
                 {/* END SIGN IN */}
