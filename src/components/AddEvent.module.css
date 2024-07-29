@@ -1,0 +1,115 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap');
+
+:root {
+    --primary-color: #4EA685;
+    --secondary-color: #57B894;
+    --black: #000000;
+    --white: #ffffff;
+    --gray: #efefef;
+    --gray-2: #757575;
+}
+
+* {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--gray);
+}
+
+.dashboardContainer {
+    /* display: flex; */
+    width: 80%;
+    margin: 2rem auto;
+    background-color: var(--white);
+    border-radius: 1rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.dashboardHeader {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.dashboardHeader h1 {
+    color: var(--primary-color);
+}
+
+.dashboardContent {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 2rem;
+}
+
+.dashboardContent h2 {
+    color: var(--secondary-color);
+    margin-bottom: 1rem;
+}
+
+.formGroup {
+    background-color: var(--white);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    /* flex: 50% */
+}
+
+.formGroup label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--black);
+}
+
+.formGroup input,
+.formGroup select,
+.formGroup textarea {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--gray-2);
+    border-radius: 0.5rem;
+    font-family: 'Poppins', sans-serif;
+}
+
+.formGroup input[type="file"] {
+    padding: 0;
+}
+
+.formGroup input[type="checkbox"] {
+    width: auto;
+    margin-right: 0.5rem;
+}
+
+.bookingTabs button {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+    padding: 0.5rem 1rem;
+    margin-right: 0.5rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+}
+
+.bookingTabs button:hover {
+    background-color: var(--secondary-color);
+}
+
+.submitButton {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.submitButton:hover {
+    background-color: var(--secondary-color);
+}

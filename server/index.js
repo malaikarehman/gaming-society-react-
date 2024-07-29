@@ -8,6 +8,9 @@ const session = require("express-session");
 const bodyParser = require("body-parser");
 const nodemailer = require("nodemailer");
 const MemberModel = require('./models/Member');
+const EventModel = require('./models/Event');
+
+
 
 const app= express();
 const PORT = process.env.PORT || 5001; 
@@ -146,8 +149,46 @@ app.post('/reset-password/:id/:token', (req, res) => {
     })
 });
 
+app.post("/addevent", (req, res) => {
+    const { startDate, duration, eventTimes, eventTitle, eventSummary, eventPhoto, venue, capacity, venueOptions, infoUrl } = req.body;
+    EventModel.create({ startDate: startDate,
+        duration: duration,
+        eventTimes: eventTimes,
+        eventTitle: eventTitle,
+        eventSummary:eventSummary,
+        eventPhoto: eventPhoto,
+        venue:venue,
+        capacity:capacity,
+        venueOptions: venueOptions,
+        infoUrl:infoUrl })
+    // const newEvent = new EventModel({
+    //     startDate,
+    //     duration,
+    //     eventTimes,
+    //     eventTitle,
+    //     eventSummary,
+    //     eventPhoto,
+    //     venue,
+    //     capacity,
+    //     venueOptions,
+    //     infoUrl
+    // });
+
+    // newEvent.save()
+    //     .then(event => res.status(201).json(event))
+    //     .catch(err => res.status(400).json({ error: err.message }));
+});
+
+
 app.listen(PORT, () => {
     console.log(`server is runnning on ${PORT}`);
 })
 
 // const http = require('http'); const server = http.createServer(app); server.listen(PORT);
+
+
+
+
+
+
+
