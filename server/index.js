@@ -9,6 +9,7 @@ const bodyParser = require("body-parser");
 const nodemailer = require("nodemailer");
 const MemberModel = require('./models/Member');
 const EventModel = require('./models/Event');
+const EventRequestModel = require("./models/EventRequest");
 
 
 
@@ -17,13 +18,16 @@ const PORT = process.env.PORT || 5001;
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(bodyParser.json());
 
 app.use(cors({
-    origin: ["http://localhost:5173"],
-    methods: ["GET", "POST"],
+    origin: "http://localhost:5173", // Adjust the origin to match your frontend URL
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
 }));
+console.log('Applying bodyParser middleware with increased payload limits');
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+
 app.use(session({
     secret: 'malaika',
     resave: false,
@@ -57,11 +61,13 @@ app.post("/signup", (req, res) => {
                 MemberModel.create({name: name, email: email, password: hash, role: role, team: team})
                 .then(user => {
                     res.status(201).json(user);
-                    res.send({message: "success"})
+                    req.session.username = user.name;
+                    console.log(req.session.username);
+                    res.send({message: "success", SignIn: true})
                 })
-                .catch(err => res.status(400).json({ error: err.message }));
+                .catch(err => res.status(400).json({ error: err.message , SignIn: false}));
             })
-            .catch(err => res.send({message: err}))
+            .catch(err => res.send({message: err, SignIn: false}))
 })
 
 app.post("/signin", (req, res) => {
@@ -78,6 +84,7 @@ app.post("/signin", (req, res) => {
                     if (match) {
                         console.log('Signin success');
                         req.session.username = user.name;
+                        req.session.userId = user._id;
                         console.log(req.session.username);
                         return res.status(200).json({SignIn: true});
                     } else {
@@ -149,41 +156,92 @@ app.post('/reset-password/:id/:token', (req, res) => {
     })
 });
 
-app.post("/addevent", (req, res) => {
-    const { startDate, duration, eventTimes, eventTitle, eventSummary, eventPhoto, venue, capacity, venueOptions, infoUrl } = req.body;
-    EventModel.create({ startDate: startDate,
+app.post('/addevent', (req, res) => {
+    console.log('Received POST request on /addevent with data:', req.body);
+    const { startDate, duration, eventTimes, eventTitle, eventSummary, eventPhoto, venue, capacity, infoUrl } = req.body;
+
+    EventModel.create({
+        startDate,
+        duration,
+        eventTimes,
+        eventTitle,
+        eventSummary,
+        eventPhoto,
+        venue,
+        capacity,
+        infoUrl
+    })
+    .then(event => {
+        console.log('Event created successfully:', event);
+        res.status(201).json(event);
+    })
+    .catch(err => {
+        console.error('Error creating event:', err);
+        res.status(400).json({ error: err.message });
+    });
+});
+
+app.post("/request-event", (req, res) => {
+    const { startDate, duration, eventTitle, eventSummary,  venue, capacity, infoUrl } = req.body;
+    EventRequestModel.create({ 
+        startDate: startDate,
         duration: duration,
-        eventTimes: eventTimes,
         eventTitle: eventTitle,
         eventSummary:eventSummary,
-        eventPhoto: eventPhoto,
         venue:venue,
         capacity:capacity,
-        venueOptions: venueOptions,
         infoUrl:infoUrl })
-    // const newEvent = new EventModel({
-    //     startDate,
-    //     duration,
-    //     eventTimes,
-    //     eventTitle,
-    //     eventSummary,
-    //     eventPhoto,
-    //     venue,
-    //     capacity,
-    //     venueOptions,
-    //     infoUrl
-    // });
+        .then(event => {  res.status(201).json(event) })
+        .catch(err => res.status(400).json({  error: err.message  }));
+  
+});
 
-    // newEvent.save()
-    //     .then(event => res.status(201).json(event))
-    //     .catch(err => res.status(400).json({ error: err.message }));
+app.get("/events", async (req, res) => {
+    try {
+        const events = await EventModel.find();
+        res.json(events);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.get('/event/:id', async (req, res) => {
+    try {
+        const event = await Event.findById(req.params.id);
+        if (event) {
+            res.json({event, userId : req.session.userId});
+        } else {
+            res.status(404).json({ message: 'Event not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'An error occurred while fetching the event' });
+    }
+});
+
+app.post('/bookings', async (req, res) => {
+    try {
+        const { eventId, userId } = req.body;
+        const newBooking = new Booking({ eventId, userId });
+        await newBooking.save();
+        res.status(201).json(newBooking);
+    } catch (error) {
+        res.status(500).json({ error: 'An error occurred while creating the booking' });
+    }
+});
+
+app.get('/bookings', async (req, res) => {
+    try {
+        const bookings = await Booking.find().populate('eventId');
+        res.json(bookings);
+    } catch (error) {
+        res.status(500).json({ error: 'An error occurred while fetching the bookings' });
+    }
 });
 
 
 app.listen(PORT, () => {
     console.log(`server is runnning on ${PORT}`);
 })
-
 // const http = require('http'); const server = http.createServer(app); server.listen(PORT);
 
 

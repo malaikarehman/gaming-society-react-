@@ -8,6 +8,9 @@ import Home from './components/Home';
 import ForgotPassword from './components/ForgotPassword';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import AddEvent from "./components/AddEvent";
+import RequestEvent from "./components/RequestEvent";
+import EventList from "./components/EventList.jsx";
+import EventDetails from "./components/EventDetails";
 
 function App() {
   return (
@@ -23,6 +26,9 @@ function App() {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password/:id/:token" element={<ResetPassword />} />
       <Route path="/addEvent" element={ <AddEvent />}></Route>
+      <Route path="/request-event" element={ <RequestEvent />}></Route>
+      <Route path="/events" element={ <EventList />}></Route>
+      <Route path="/event/:id" element={ <EventDetails />}></Route>
     </Routes>
   </Router>
   </GoogleOAuthProvider>

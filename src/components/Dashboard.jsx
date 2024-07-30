@@ -26,6 +26,9 @@ export default function Dashboard() {
       <Link to='/addEvent' >
       <Button>Add Event</Button>
       </Link>
+      <Link to='/request-event' >
+      <Button>Add Event</Button>
+      </Link>
     </div>
   );
 }

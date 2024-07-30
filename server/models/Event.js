@@ -1,4 +1,4 @@
-// server/models/Event.js
+
 const mongoose = require('mongoose');
 
 const EventSchema = new mongoose.Schema({
@@ -6,7 +6,7 @@ const EventSchema = new mongoose.Schema({
     duration: { type: Number, required: true },
     eventTimes: [{
         startTime: { type: String},
-        endTime: { type: String},
+        endTime: { type: String}
     }],
     eventTitle: { type: String, required: true },
     eventSummary: { type: String },
